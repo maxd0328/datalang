@@ -1,0 +1,20 @@
+[any]
+... # Literally everything
+
+[integer]
+0 | 1 | -1 | 2 | ... # Every integer
+
+[float]
+0.0 | ... # Every float
+
+[string]
+"" | ... # Every string
+
+[bool]
+true | false
+
+[array <- type: any <- length: integer]
+[type, type, ...] # up to length for all possible lengths
+
+[map <- type: any]
+... # every permutation of map keys with values of `type`

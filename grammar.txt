@@ -1,0 +1,75 @@
+% -------------------------------------------------------------------------------------------------------------------
+% Official DataLang Grammar Sheet
+% Authored by Max Derbenwick - 2025
+% -------------------------------------------------------------------------------------------------------------------
+
+START #Sections;
+
+% -------------------------------------------------------------------------------------------------------------------
+% Sections
+
+#Sections => unnamed:#UnnamedSection? rest:#Section*;
+
+#Section => header:#SectionHeader entries:(#MapEntry #CommaOrNewlineDelimiter)*;
+#UnnamedSection => entries:(#MapEntry #CommaOrNewlineDelimiter)+;
+
+#CommaOrNewlineDelimiter => [$COMMA $NEWLINE];
+
+#SectionHeader => $LBRACKET id:[$IDENT $DASH] schema:($COLON #Value)? args:#SectionArgument* $RBRACKET;
+#SectionArgument => $LARROW id:$IDENT $COLON schema:#Value;
+
+% -------------------------------------------------------------------------------------------------------------------
+% Map entries and declaration selectors
+
+DYNAMIC #MapEntry => #CanonicalMapEntry, #LetBinding;
+#CanonicalMapEntry => key:[$IDENT $STRING] $COLON value:#Value;
+#LetBinding => $KEYW_LET key:$IDENT $COLON value:#Value;
+
+% -------------------------------------------------------------------------------------------------------------------
+% Values and value schema
+
+DYNAMIC #Value [#DynUnion] => #ValueUnion, #DynUnionNext;
+DYNAMIC #DynApplication [#DynUnionNext] => #Application, #DynApplicationNext;
+DYNAMIC #DynSelector [#DynApplicationNext] => #KeySelector, #StringKeySelector, #IndexSelector, #DynSelectorNext;
+DYNAMIC #DynPrimary [#DynSelectorNext] => #GlobalReference, #BindingReference, #Integer, #Float,
+      #String, #IntegerRange, #FloatRange, #Array, #Map, #GroupedValue;
+
+#ValueUnion => lhs:#DynUnion $PIPE rhs:#DynUnionNext;
+#Application => glbl:$IDENT args:#DynApplicationNext+;
+
+#KeySelector => inner:#DynSelector $DOT key:$IDENT;
+#StringKeySelector => inner:#DynSelector $DOT key:$STRING;
+#IndexSelector => inner:#DynSelector $DOT index:$INTEGER;
+
+#GlobalReference => id:$IDENT;
+#BindingReference => $DOLLAR id:$IDENT;
+#Integer => $INTEGER;
+#Float => $FLOAT;
+#String => $STRING;
+
+DYNAMIC #IntegerRange => #ClosedStartIntegerRangeInclExcl, #ClosedStartIntegerRangeInclIncl,
+      #ClosedStartIntegerRangeExclExcl, #ClosedStartIntegerRangeExclIncl, #OpenStartIntegerRange;
+#ClosedStartIntegerRangeInclExcl => start:$INTEGER PREC HIGH $DBL_DOT end:$INTEGER?;
+#ClosedStartIntegerRangeInclIncl => start:$INTEGER PREC HIGH $DBL_DOT $EQU end:$INTEGER;
+#ClosedStartIntegerRangeExclExcl => $GRT start:$INTEGER $DBL_DOT end:$INTEGER?;
+#ClosedStartIntegerRangeExclIncl => $GRT start:$INTEGER $DBL_DOT $EQU end:$INTEGER;
+#OpenStartIntegerRange => $DBL_DOT incl_end:$EQU? end:$INTEGER;
+EXTERN PREC LOW "#$INTEGER? =>";
+
+DYNAMIC #FloatRange => #ClosedStartFloatRangeInclExcl, #ClosedStartFloatRangeInclIncl,
+      #ClosedStartFloatRangeExclExcl, #ClosedStartFloatRangeExclIncl, #OpenStartFloatRange;
+#ClosedStartFloatRangeInclExcl => start:$FLOAT PREC HIGH $DBL_DOT end:$FLOAT?;
+#ClosedStartFloatRangeInclIncl => start:$FLOAT PREC HIGH $DBL_DOT $EQU end:$FLOAT;
+#ClosedStartFloatRangeExclExcl => $GRT start:$FLOAT $DBL_DOT end:$FLOAT?;
+#ClosedStartFloatRangeExclIncl => $GRT start:$FLOAT $DBL_DOT $EQU end:$FLOAT;
+#OpenStartFloatRange => $DBL_DOT incl_end:$EQU? end:$FLOAT;
+EXTERN PREC LOW "#$FLOAT? =>";
+
+#Array => $LBRACKET elems:OPT_DELIM_LIST(#Value #CommaOrNewlineDelimiter) $RBRACKET;
+#Map => $LBRACE entries:OPT_DELIM_LIST(#MapEntry #CommaOrNewlineDelimiter) $RBRACE;
+
+#GroupedValue => $LPAREN inner:#Value $RPAREN;
+
+% -------------------------------------------------------------------------------------------------------------------
+% End of DataLang Grammar Sheet
+% -------------------------------------------------------------------------------------------------------------------

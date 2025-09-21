@@ -1,0 +1,29 @@
+[example-schema]
+address: {
+   houseNumber: integer
+   street: string
+   city: string
+   country: string
+   postcode: 0..=9999
+}
+employees: array 0.. {
+   name: string
+   age: 16..
+   title: string
+}
+
+[-: example-schema]
+address: {
+   houseNumber: 10
+   street: "Datalang Road"
+   city: "Dataville"
+   country: "Krakozia"
+   postcode: 5600
+}
+employees: [
+   {
+      name: "Sir Data von Lang"
+      age: 20
+      title: "Intern"
+   }
+]

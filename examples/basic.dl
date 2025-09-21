@@ -1,0 +1,28 @@
+office: {
+   address: {
+      houseNumber: 127
+      street: "Example St."
+      city: "Berlin"
+      country: "Germany"
+      postcode: 12345
+   }
+   floors: 3
+   codes: [
+      1
+      54
+      31
+      199
+   ]
+}
+employees: [
+   {
+      name: "John Smith"
+      age: 31
+      title: "Advanced Engineer"
+   }
+   {
+      name: "Boss von Manager"
+      age: 54
+      title: "Team Manager"
+   }
+]
