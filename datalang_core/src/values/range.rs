@@ -1,6 +1,7 @@
 use std::ops::Bound;
-use super::{Value, ValueFeatures};
+use super::{Value, ValueFeatures, KeySelectionError, IndexSelectionError};
 use super::literal::{FloatLiteral, IntegerLiteral};
+use crate::concrete::ConcreteValue;
 
 #[derive(Debug, Clone)]
 pub struct IntegerRange {
@@ -38,12 +39,24 @@ impl IntegerRange {
 }
 
 impl ValueFeatures for IntegerRange {
-   fn select_key(&self, key: &str) -> Option<&Value> {
+   fn select_key(&self, key: &str) -> Result<&Value, KeySelectionError> {
       match key {
-         "start" => self.start_repr.as_ref().map(|v| &**v),
-         "end" => self.end_repr.as_ref().map(|v| &**v),
-         _ => None
+         "start" => self.start_repr.as_ref().map(|v| &**v).ok_or(KeySelectionError::NoSuchKey),
+         "end" => self.end_repr.as_ref().map(|v| &**v).ok_or(KeySelectionError::NoSuchKey),
+         _ => Err(KeySelectionError::NoSuchKey)
       }
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      crate::range_utils::singleton_range(self.start, self.end).is_some()
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      Some(ConcreteValue::Integer(crate::range_utils::singleton_range(self.start, self.end)?))
    }
 }
 
@@ -65,11 +78,23 @@ impl FloatRange {
 }
 
 impl ValueFeatures for FloatRange {
-   fn select_key(&self, key: &str) -> Option<&Value> {
+   fn select_key(&self, key: &str) -> Result<&Value, KeySelectionError> {
       match key {
-         "start" => self.start_repr.as_ref().map(|v| &**v),
-         "end" => self.end_repr.as_ref().map(|v| &**v),
-         _ => None
+         "start" => self.start_repr.as_ref().map(|v| &**v).ok_or(KeySelectionError::NoSuchKey),
+         "end" => self.end_repr.as_ref().map(|v| &**v).ok_or(KeySelectionError::NoSuchKey),
+         _ => Err(KeySelectionError::NoSuchKey)
       }
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      crate::range_utils::singleton_range_float(self.start, self.end).is_some()
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      Some(ConcreteValue::Float(crate::range_utils::singleton_range_float(self.start, self.end)?))
    }
 }

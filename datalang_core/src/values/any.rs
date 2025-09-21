@@ -1,4 +1,6 @@
-use super::{Value, ValueFeatures};
+use super::{Value, ValueFeatures, KeySelectionError, IndexSelectionError};
+use super::union::Union;
+use crate::concrete::ConcreteValue;
 
 #[derive(Debug, Clone)]
 pub struct AnyValue;
@@ -16,50 +18,134 @@ pub struct AnyArray(pub Box<Value>, pub Box<Value>);
 pub struct AnyMap(pub Box<Value>);
 
 impl ValueFeatures for AnyValue {
-   fn select_key(&self, _key: &str) -> Option<&Value> {
-       None
+   fn select_key(&self, _key: &str) -> Result<&Value, KeySelectionError> {
+      Err(KeySelectionError::NotSelectable)
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyInteger {
-   fn select_key(&self, _key: &str) -> Option<&Value> {
-       None
+   fn select_key(&self, _key: &str) -> Result<&Value, KeySelectionError> {
+      Err(KeySelectionError::NotSelectable)
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyFloat {
-   fn select_key(&self, _key: &str) -> Option<&Value> {
-       None
+   fn select_key(&self, _key: &str) -> Result<&Value, KeySelectionError> {
+      Err(KeySelectionError::NotSelectable)
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyString {
-   fn select_key(&self, _key: &str) -> Option<&Value> {
-       None
+   fn select_key(&self, _key: &str) -> Result<&Value, KeySelectionError> {
+      Err(KeySelectionError::NotSelectable)
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyBool {
-   fn select_key(&self, _key: &str) -> Option<&Value> {
-       None
+   fn select_key(&self, _key: &str) -> Result<&Value, KeySelectionError> {
+      Err(KeySelectionError::NotSelectable)
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyArray {
-   fn select_key(&self, key: &str) -> Option<&Value> {
+   fn select_key(&self, key: &str) -> Result<&Value, KeySelectionError> {
       match key {
-         "valueschema" => Some(&self.0),
-         "length" => Some(&self.1),
-         _ => None
+         "valueschema" => Ok(&self.0),
+         "length" => Ok(&self.1),
+         _ => Err(KeySelectionError::NotSelectable)
       }
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }
 
 impl ValueFeatures for AnyMap {
-   fn select_key(&self, key: &str) -> Option<&Value> {
+   fn select_key(&self, key: &str) -> Result<&Value, KeySelectionError> {
       match key {
-         "valueschema" => Some(&self.0),
-         _ => None
+         "valueschema" => Ok(&self.0),
+         _ => todo!()
       }
+   }
+
+   fn select_index(&self, _index: i32) -> Result<&Value, IndexSelectionError> {
+      Err(IndexSelectionError::NotSelectable)
+   }
+
+   fn is_definite(&self) -> bool {
+      false
+   }
+
+   fn concretize(self) -> Option<ConcreteValue> {
+      None
    }
 }

@@ -13,7 +13,7 @@
 [bool]
 true | false
 
-[array <- type: any <- length: integer]
+[array <- length: 0.. <- type: any]
 [type, type, ...] # up to length for all possible lengths
 
 [map <- type: any]
